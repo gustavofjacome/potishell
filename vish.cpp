@@ -1,6 +1,10 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
+#include <stdexcept> 
+#include <sys/stat.h> 
+#include <stdio.h>
 
 void process_command(std::string command) {
     // comandos internos
@@ -46,17 +50,35 @@ void process_command(std::string command) {
 
 
 
+std::string ocultaDiretorio(const std::string& nomeDir) {
+    if (!nomeDir.empty() && nomeDir[0] == '.') {
+        return nomeDir;
+    }
+    return "." + nomeDir;
+}
+
+
+
+
 // TODO: PESQUISAR 
 // como rodar em sudo
 // criar o diretorio com o syscall mkdir?
 // criar um fork para rodar os comandos linux?
 // ou usar os syscall para fazer tudo?
-void moveParaTemp(char* nomeDoArquivo){
-
-    
-
-
+void criaPastaOculta(char* nomeDir){
+    if (nomeDir == NULL || strlen(nomeDir)) {
+        throw std::invalid_argument("o valor nao pode ser nulo nem vazio");
+    }
+    if (nomeDir[0] == '.') { // ja ta oculto
+        mkdir(nomeDir, 0777);
+    } else {
+        std::string diretorioPath = ocultaDiretorio(nomeDir);
+        mkdir(diretorioPath.c_str(), 0777);
+    }
 }
+
+
+
 
 
 
