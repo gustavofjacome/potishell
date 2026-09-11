@@ -7,6 +7,8 @@ void process_command(std::string command) {
     if (command == "exit")
         exit(0);
 
+    if (command == "vish --version")
+        std::cout << "1.0" << '\n';
    
     // caminho onde serão procurados os binarios /bin/comando
     std::string absolute_path = "/bin/" + command;
@@ -41,6 +43,29 @@ void process_command(std::string command) {
         std::cout << "Command not found: " << command << std::endl; // se nao existe
     }
 }
+
+
+
+// TODO: PESQUISAR 
+// como rodar em sudo
+// criar o diretorio com o syscall mkdir?
+// criar um fork para rodar os comandos linux?
+// ou usar os syscall para fazer tudo?
+void moveParaTemp(char* nomeDoArquivo){
+
+    
+
+
+}
+
+
+
+
+
+
+
+
+
 
 int main() {
     while (true) {
