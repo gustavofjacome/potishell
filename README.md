@@ -37,8 +37,10 @@ Mas valeu o aprendizado.
 
 Algumas das funcionalidades e conceitos utilizados na implementação foram estudados a partir das seguintes referências:
 
-* [Tutorial - Write a Shell in C](https://brennan.io/2015/01/16/write-a-shell-in-c/)  -> os mais importantes
-* [making-linux-shell-c](https://www.geeksforgeeks.org/c/making-linux-shell-c/)       -> os mais importantes
+*[Linux SystemCalls] (https://linasm.sourceforge.net/docs/syscalls/filesystem.php#file) -> usei para ver os parametros dos systemcalls
+
+* [Tutorial - Write a Shell in C](https://brennan.io/2015/01/16/write-a-shell-in-c/)    -> muito importante
+* [making-linux-shell-c](https://www.geeksforgeeks.org/c/making-linux-shell-c/)         -> muito importante
 
 
 * [Ask Ubuntu — How to really clear the terminal?](https://askubuntu.com/questions/25077/how-to-really-clear-the-terminal)   -> Usei para aprender a limpar o terminal 
