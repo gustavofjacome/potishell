@@ -13,7 +13,14 @@ void process_command(std::string command) {
         exit(0);
     }
 
-    if (command == "vish --versao") {
+    if (command == "ajuda") {
+    std::cout << "poti$h🦐 - Comandos internos disponíveis:\n";
+    std::cout << "  clear      Limpa a tela\n";
+    std::cout << "  exit       Sai do shell\n";
+    return;
+}
+
+    if (command == "potish --versao") {
         std::cout << "1.0" << '\n';
         return;
     }
