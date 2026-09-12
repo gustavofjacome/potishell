@@ -51,6 +51,7 @@ void verificacoesErros(const std::string& absolute_path, const std::string& prog
 bool executarComandosInternos(const std::vector<std::string>& args);
 void executarComandosExterno(std::vector<std::string>& args);
 void process_command(std::string command);
+void potishLoop(bool interruptor, std::string nomeShell);
 
 
 
@@ -149,6 +150,18 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
         }
         return true;
     }
+
+    if (comando == "pwd") {
+        char buffer[1024];
+        if (getcwd(buffer, sizeof(buffer)) != nullptr) {
+            std::cout << buffer << '\n';
+        } else {
+            throw std::runtime_error("poti$h erro: Falha ao obter o diretório atual.");
+        }
+        return true;
+        
+    }
+    
     
     return false; // se nao caiu em nenhum é interno
 }
