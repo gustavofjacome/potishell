@@ -44,6 +44,31 @@ namespace Terminal {
     }
 }
 
+// defini os cabeçalhos das funções aqui em cima apenas para permitir deixar a main como primeira função
+std::vector<std::string> geraVetorAgumentos(std::string comando);
+std::vector<char*> converterParaArgv(std::vector<std::string>& args);
+void verificacoesErros(const std::string& absolute_path, const std::string& programa);
+bool executarComandosInternos(const std::vector<std::string>& args);
+void executarComandosExterno(std::vector<std::string>& args);
+void process_command(std::string command);
+
+
+
+//main
+int main() {
+    const std::string nomeBashFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
+    potishLoop(true, nomeBashFormatado);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
 
 std::vector<std::string> geraVetorAgumentos(std::string comando) {
     std::vector<std::string> argumentosString;
@@ -186,8 +211,3 @@ void potishLoop(bool interruptor, std::string nomeShell){
     }
 }
 
-int main() {
-    const std::string potishFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
-    potishLoop(true, potishFormatado);
-    return 0;
-}
