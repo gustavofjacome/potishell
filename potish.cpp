@@ -157,9 +157,21 @@ void process_command(std::string command) {
             execve(absolute_path.c_str(), argv.data(), NULL);
             exit(1);
     } else {
-        throw std::runtime_error("erro: Sem permissão para executar: " + command);
+         waitpid(pid, nullptr, 0);
     }
-}
+
+} 
+
+     
+
+
+
+
+
+
+
+
+
 
 int main() {
     const std::string potishFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
@@ -174,7 +186,14 @@ int main() {
         getline(std::cin, command);
 
         if (!command.empty()) {
-            process_command(command);
+            try {
+                process_command(command);
+            }
+            catch (const std::exception& e) {
+                std::cout << Cor::vermelho(e.what()) << "\n";
+            }
+            
+            
         }
     }
 
