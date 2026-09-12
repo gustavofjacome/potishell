@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <string>
+#include <vector>
 
 void comandosInternos(std::string comandoInterno) {
 
@@ -40,6 +41,15 @@ std::vector<std::string> geraVetorAgumentos(std::string comando) {
 
 
 
+void verificacoesErros(const std::string& absolute_path, const std::string& command) {
+    if (access(absolute_path.c_str(), F_OK) != 0) {
+        throw std::runtime_error("poti$h erro: Comando não encontrado: " + command);
+    }
+
+    if (access(absolute_path.c_str(), X_OK) != 0) {
+        throw std::runtime_error("poti$h erro: Sem permissão para executar: " + command);
+    }
+}
 
 
 
@@ -57,7 +67,7 @@ void process_command(std::string command) {
     std::cout << "  clear      Limpa a tela\n";
     std::cout << "  exit       Sai do shell\n";
     return;
-}
+    }
 
     if (command == "potish --versao") {
         std::cout << "1.0" << '\n';
@@ -68,6 +78,8 @@ void process_command(std::string command) {
         std::cout << "\033[2J\033[1;1H";
         return;
     }
+    
+
 
     std::string absolute_path = "/bin/" + command;
 
@@ -75,9 +87,7 @@ void process_command(std::string command) {
         absolute_path = command;
     }
 
-    if (access(absolute_path.c_str(), F_OK) == 0) {
-        if (access(absolute_path.c_str(), X_OK) == 0) {
-            pid_t pid = fork();
+    verificacoesErros(absolute_path, command);
 
             if (pid < 0) {
                 std::cout << "Erro de execução!" << std::endl;
