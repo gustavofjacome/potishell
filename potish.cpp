@@ -79,6 +79,16 @@ std::vector<std::string> geraVetorAgumentos(std::string comando) {
     return argumentosString;
 }
 
+std::vector<char*> converterParaArgv(std::vector<std::string>& args) {
+    std::vector<char*> argv;
+    
+    for (size_t i = 0; i < args.size(); ++i) {
+        argv.push_back(const_cast<char*>(args[i].c_str()));
+    }
+    
+    argv.push_back(nullptr);
+    return argv;
+}
 
 
 
