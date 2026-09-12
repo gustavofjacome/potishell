@@ -9,12 +9,17 @@
 
 void process_command(std::string command) {
 
-    if (command == "exit") {
+    if (command == "sair") {
         exit(0);
     }
 
-    if (command == "vish --version") {
+    if (command == "vish --versao") {
         std::cout << "1.0" << '\n';
+        return;
+    }
+
+    if (command == "limpar") {
+        std::cout << "\033[2J\033[1;1H";
         return;
     }
 
