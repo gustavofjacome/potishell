@@ -3,7 +3,7 @@
 int main(){
   int a, b;
 
-  a = 1;
+  a = 0;
   b = 6;
 
   std::cout << a + b << '\n';
