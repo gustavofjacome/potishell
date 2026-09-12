@@ -8,7 +8,16 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <stack>
+#include <deque> // havia pensado e fazer com fila, mas pesquisando vi que o deque é mais eficiente pois é o(1) nas pontas
+
+// defini os cabeçalhos das funções aqui em cima apenas para permitir deixar a main como primeira função
+std::vector<std::string> geraVetorAgumentos(std::string comando);
+std::vector<char*> converterParaArgv(std::vector<std::string>& args);
+void verificacoesErros(const std::string& absolute_path, const std::string& programa);
+bool executarComandosInternos(const std::vector<std::string>& args);
+void executarComandosExterno(std::vector<std::string>& args);
+void process_command(std::string command);
+void potishLoop(bool interruptor, std::string nomeShell);
 
 
 namespace Cor {
@@ -45,14 +54,42 @@ namespace Terminal {
     }
 }
 
-// defini os cabeçalhos das funções aqui em cima apenas para permitir deixar a main como primeira função
-std::vector<std::string> geraVetorAgumentos(std::string comando);
-std::vector<char*> converterParaArgv(std::vector<std::string>& args);
-void verificacoesErros(const std::string& absolute_path, const std::string& programa);
-bool executarComandosInternos(const std::vector<std::string>& args);
-void executarComandosExterno(std::vector<std::string>& args);
-void process_command(std::string command);
-void potishLoop(bool interruptor, std::string nomeShell);
+namespace Sessao {
+    std::deque<std::string> historico;
+
+    inline void adicionar(const std::string& comando) {
+        historico.push_front(comando);
+        if (historico.size() > 10) {
+            historico.pop_back();
+        }
+    }
+
+    inline void imprimir() {
+        for (int i = historico.size() - 1; i >= 0; --i) {
+            std::cout << i << " " << historico[i] << '\n';
+        }
+    }
+
+    inline void limpar() {
+        historico.clear();
+    }
+
+    inline void executarPorOffset(int offset) {
+        if (offset < 0 || offset >= historico.size()) {
+            throw std::runtime_error("poti$h erro: Offset de history inválido.");
+        }
+        std::string cmdSalvo = historico[offset];
+        std::cout << cmdSalvo << '\n'; 
+        process_command(cmdSalvo);    
+    }
+}
+
+
+
+
+
+
+
 
 
 
@@ -163,7 +200,29 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
         
     }
     
-    
+    if (comando == "history") {
+        if (args.size() == 1) {
+            Sessao::imprimir();
+            return true;
+        } 
+        else if (args.size() == 2) {
+            if (args[1] == "-c") {
+                Sessao::limpar();
+                return true;
+            } 
+            else {
+                try {
+                    int offset = std::stoi(args[1]); 
+                    Sessao::executarPorOffset(offset); 
+                    return true;
+                } catch (const std::invalid_argument&) {
+                    throw std::runtime_error("poti$h erro: history offset deve ser um número válido. (1 à 10)");
+                }
+            }
+        }
+    }
+
+
     return false; // se nao caiu em nenhum é interno
 }
 
@@ -215,11 +274,12 @@ void potishLoop(bool interruptor, std::string nomeShell){
         getline(std::cin, command);
 
         if (!command.empty()) {
+            Sessao::adicionar(command);
             try {
                 process_command(command);
             }
-            catch (const std::exception& e) {
-                std::cout << Cor::vermelho(e.what()) << "\n";
+            catch (const std::exception& erro) {
+                std::cout << Cor::vermelho(erro.what()) << "\n";
             }
         }
     }
