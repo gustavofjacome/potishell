@@ -15,6 +15,36 @@ void comandosInternos(std::string comandoInterno) {
 
 
 
+std::vector<std::string> geraVetorAgumentos(std::string comando) {
+    std::vector<std::string> argumentosString;
+    
+    size_t inicio = 0;
+    size_t fim = comando.find(' ');
+
+    while (fim != std::string::npos) {
+
+        if (inicio != fim) {
+            argumentosString.push_back(comando.substr(inicio, fim - inicio));
+        }
+        inicio = fim + 1; 
+        fim = comando.find(' ', inicio); 
+    }
+
+    if (inicio < comando.length()) {
+        argumentosString.push_back(comando.substr(inicio));
+    }
+
+    return argumentosString;
+}
+
+
+
+
+
+
+
+
+
 
 void process_command(std::string command) {
 
