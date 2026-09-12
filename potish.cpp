@@ -106,7 +106,6 @@ void verificacoesErros(const std::string& absolute_path, const std::string& comm
 
 
 
-
 void process_command(std::string command) {
 
     if (command == "sair") {
@@ -132,7 +131,13 @@ void process_command(std::string command) {
     
 
 
-    std::string absolute_path = "/bin/" + command;
+    std::vector<std::string> args = geraVetorAgumentos(command);
+    if (args.empty()) {
+        return;
+    } 
+
+    std::string programa = args[0];
+    std::string absolute_path = "/bin/" + programa;
 
     if (std::count(command.begin(), command.end(), '/') > 0) {
         absolute_path = command;
