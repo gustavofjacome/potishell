@@ -37,6 +37,15 @@ namespace Cor {
 }
 
 
+// codigos ansi
+namespace Terminal {
+    const std::string LIMPAR_TELA = "\033[2J\033[1;1H"; 
+    const std::string LIMPAR_LINHA = "\033[2K";         
+    
+    inline void limpar() {
+        std::cout << LIMPAR_TELA;
+    }
+}
 
 
 
@@ -44,8 +53,30 @@ namespace Cor {
 
 
 
-void comandosInternos(std::string comandoInterno) {
 
+
+bool comandosInternos(std::string comandoInterno) {
+    if (comandoInterno == "sair") {
+        exit(0);
+        return true;
+    }
+
+    if (comandoInterno == "ajuda" || comandoInterno == "help") {
+        std::cout << "poti$h🦐 - Comandos internos disponíveis:\n";
+        std::cout << "  clear      Limpa a tela\n";
+        std::cout << "  exit       Sai do shell\n";
+        return true;
+    }
+
+    if (comandoInterno == "potish --versao" || comandoInterno == "potish -versao" || comandoInterno == "potish -v" || comandoInterno == "potish --v") {
+        std::cout << "1.1" << '\n';
+        return true;
+    }
+
+    if (comandoInterno == "limpar" || comandoInterno == "clear" || comandoInterno == "cls") {
+        Terminal::limpar();
+        return true;
+    }
 }
 
 
@@ -108,57 +139,43 @@ void verificacoesErros(const std::string& absolute_path, const std::string& comm
 
 void process_command(std::string command) {
 
-    if (command == "sair") {
-        exit(0);
-    }
-
-    if (command == "ajuda") {
-    std::cout << "poti$h🦐 - Comandos internos disponíveis:\n";
-    std::cout << "  clear      Limpa a tela\n";
-    std::cout << "  exit       Sai do shell\n";
-    return;
-    }
-
-    if (command == "potish --versao") {
-        std::cout << "1.0" << '\n';
+    if (comandosInternos(command)) {
         return;
-    }
+    } else{
+        std::vector<std::string> args = geraVetorAgumentos(command);
+        if (args.empty()) {
+            return;
+        } 
 
-    if (command == "limpar") {
-        std::cout << "\033[2J\033[1;1H";
-        return;
+        std::string programa = args[0];
+        std::string absolute_path = "/bin/" + programa;
+
+        if (std::count(command.begin(), command.end(), '/') > 0) {
+            absolute_path = command;
+        }
+
+        verificacoesErros(absolute_path, command);
+
+
+        pid_t pid = fork();
+
+        if (pid < 0) {
+            throw std::invalid_argument("poti$h erro: Falha no (fork) " + command);
+            return;
+
+        } else if (pid == 0) {
+            std::vector<char*> argv = converterParaArgv(args);
+                execve(absolute_path.c_str(), argv.data(), NULL);
+                exit(1);
+        } else {
+            waitpid(pid, nullptr, 0);
+        }
     }
     
 
+    
 
-    std::vector<std::string> args = geraVetorAgumentos(command);
-    if (args.empty()) {
-        return;
-    } 
-
-    std::string programa = args[0];
-    std::string absolute_path = "/bin/" + programa;
-
-    if (std::count(command.begin(), command.end(), '/') > 0) {
-        absolute_path = command;
-    }
-
-    verificacoesErros(absolute_path, command);
-
-
-    pid_t pid = fork();
-
-    if (pid < 0) {
-        throw std::invalid_argument("poti$h erro: Falha no (fork) " + command);
-        return;
-
-    } else if (pid == 0) {
-        std::vector<char*> argv = converterParaArgv(args);
-            execve(absolute_path.c_str(), argv.data(), NULL);
-            exit(1);
-    } else {
-         waitpid(pid, nullptr, 0);
-    }
+    
 
 } 
 
@@ -171,16 +188,12 @@ void process_command(std::string command) {
 
 
 
+void potishLoop(bool interruptor, std::string nomeShell){
+    
 
+    while (interruptor) {
 
-int main() {
-    const std::string potishFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
-
-
-
-    while (true) {
-
-        std::cout << potishFormatado;
+        std::cout << nomeShell;
 
         std::string command;
         getline(std::cin, command);
@@ -197,5 +210,14 @@ int main() {
         }
     }
 
+}
+
+
+
+int main() {
+    const std::string potishFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
+
+    potishLoop(1, potishFormatado);
+    
     return 0;
 }
