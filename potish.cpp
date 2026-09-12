@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <algorithm>
+#include <string>
 
 void process_command(std::string command) {
 
@@ -37,7 +38,6 @@ void process_command(std::string command) {
     }
 
     if (access(absolute_path.c_str(), F_OK) == 0) {
-
         if (access(absolute_path.c_str(), X_OK) == 0) {
             pid_t pid = fork();
 
@@ -57,19 +57,22 @@ void process_command(std::string command) {
             }
 
         } else {
-            std::cout << "permission denied: " << command << std::endl;
+            std::cout << "Sem permissão: " << command << '\n';
         }
 
     } else {
-        std::cout << "Command not found: " << command << std::endl;
+        std::cout << "Comando não encontrado: " << command << '\n';
     }
 }
 
 int main() {
+    const std::string potishFormatado = "\033[1;33mpoti$h🦐 \033[1;36m❯ \033[0m";
+
+
 
     while (true) {
 
-        std::cout << "\033[1;33mpoti$h🦐 \033[1;36m❯ \033[0m";
+        std::cout << potishFormatado;
 
         std::string command;
         getline(std::cin, command);
