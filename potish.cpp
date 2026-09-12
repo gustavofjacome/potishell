@@ -8,7 +8,9 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <deque> // havia pensado e fazer com fila, mas pesquisando vi que o deque é mais eficiente pois é o(1) nas pontas
+#include <deque> 
+
+extern char **environ; //variaveis de ambiente permitiu que eu conseguisse compilar com o g++ pelo o shell ela é passada como parametro no meu execve
 
 // defini os cabeçalhos das funções aqui em cima apenas para permitir deixar a main como primeira função
 std::vector<std::string> geraVetorAgumentos(std::string comando);
@@ -18,7 +20,6 @@ bool executarComandosInternos(const std::vector<std::string>& args);
 void executarComandosExterno(std::vector<std::string>& args);
 void process_command(std::string command);
 void potishLoop(bool interruptor, std::string nomeShell);
-
 
 namespace Cor {
     const std::string RESET   = "\033[0m";
@@ -75,7 +76,7 @@ namespace Sessao {
     }
 
     inline void executarPorOffset(int offset) { 
-        if (offset < 0 || (offset + 1) >= historico.size()) {
+        if (offset < 0 || (offset + 1) >= (int)historico.size()) {
             throw std::runtime_error("poti$h erro: Offset de history inválido.");
         }
         std::string cmdSalvo = historico[offset + 1];
@@ -84,26 +85,11 @@ namespace Sessao {
     }
 }
 
-
-
-
-
-
-//main
 int main() {
     const std::string nomeBashFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
     potishLoop(true, nomeBashFormatado);
     return 0;
 }
-
-
-
-
-
-
-
-
-
 
 std::vector<std::string> geraVetorAgumentos(std::string comando) {
     std::vector<std::string> argumentosString;
@@ -141,7 +127,6 @@ void verificacoesErros(const std::string& absolute_path, const std::string& prog
     }
 }
 
-
 bool executarComandosInternos(const std::vector<std::string>& args) {
     if (args.empty()) {
         return false;
@@ -153,27 +138,32 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
         exit(0);
         return true;
     }
-
     if (comando == "ajuda" || comando == "help") {
-        std::cout << "poti$h🦐 - Comandos internos disponíveis:\n";
-        std::cout << "  cd [dir]   Muda de diretório\n";
-        std::cout << "  clear      Limpa a tela\n";
-        std::cout << "  exit       Sai do shell\n";
+        std::cout << '\n';
+        std::cout << "  " << Cor::amarelo("poti$h🦐 ") << "- Comandos Internos Disponíveis (PT/EN)\n";
+        std::cout << "  ------------------------------------------------------------\n";
+        std::cout << "  " << Cor::ciano("ajuda, help") << "           Exibe este menu de ajuda\n";
+        std::cout << "  " << Cor::ciano("cd ") << Cor::verde("[dir]") << "              Muda o diretório atual de trabalho\n";
+        std::cout << "  " << Cor::ciano("historico, history") << "    Lista os últimos 10 comandos digitados\n";
+        std::cout << "  " << Cor::ciano("historico ") << Cor::verde("-c") << "         Limpa todo o histórico da sessão\n";
+        std::cout << "  " << Cor::ciano("historico ") << Cor::verde("[0-9]") << "      Executa um comando salvo pelo seu índice\n";
+        std::cout << "  " << Cor::ciano("limpar, clear, cls") << "    Limpa a tela do terminal\n";
+        std::cout << "  " << Cor::ciano("potish ") << Cor::verde("-v, --versao") << "   Exibe a versão atual do shell\n";
+        std::cout << "  " << Cor::ciano("pwd") << "                   Exibe o caminho do diretório atual\n";
+        std::cout << "  " << Cor::ciano("sair, exit") << "            Encerra o shell\n";
+        std::cout << '\n';
         return true;
     }
-
     if (comando == "potish" && args.size() > 1) {
         if (args[1] == "--versao" || args[1] == "-versao" || args[1] == "-v") {
             std::cout << "1.1" << '\n';
             return true;
         }
     }
-
     if (comando == "limpar" || comando == "clear" || comando == "cls") {
         Terminal::limpar();
         return true;
     }
-
     if (comando == "cd") {
         if (args.size() < 2) {
             throw std::runtime_error("poti$h erro: 'cd' precisa de um diretório alvo.");
@@ -184,7 +174,6 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
         }
         return true;
     }
-
     if (comando == "pwd") {
         char buffer[2048];
         if (getcwd(buffer, sizeof(buffer)) != nullptr) {
@@ -195,8 +184,7 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
         return true;
         
     }
-    
-    if (comando == "history") {
+    if (comando == "history" || comando == "historico") {
         if (args.size() == 1) {
             Sessao::imprimir();
             return true;
@@ -217,8 +205,6 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
             }
         }
     }
-
-
     return false; // se nao caiu em nenhum é interno
 }
 
@@ -238,21 +224,18 @@ void executarComandosExterno(std::vector<std::string>& args) {
         throw std::invalid_argument("poti$h erro: Falha no (fork) " + programa);
     } else if (pid == 0) {
         std::vector<char*> argv = converterParaArgv(args);
-        execve(absolute_path.c_str(), argv.data(), NULL);
+        execve(absolute_path.c_str(), argv.data(), environ);
         exit(1);
     } else {
         waitpid(pid, nullptr, 0);
     }
 }
 
-
 void process_command(std::string command) {
-    
     std::vector<std::string> args = geraVetorAgumentos(command);
     if (args.empty()) {
         return; 
     } 
-
     if (executarComandosInternos(args)) {
         return; 
     } else {
@@ -261,7 +244,6 @@ void process_command(std::string command) {
 
     
 }
-
 
 void potishLoop(bool interruptor, std::string nomeShell){
     while (interruptor) {
@@ -280,4 +262,3 @@ void potishLoop(bool interruptor, std::string nomeShell){
         }
     }
 }
-
