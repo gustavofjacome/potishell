@@ -8,6 +8,14 @@
 #include <algorithm>
 #include <string>
 
+void comandosInternos(std::string comandoInterno) {
+
+}
+
+
+
+
+
 void process_command(std::string command) {
 
     if (command == "sair") {
@@ -57,11 +65,11 @@ void process_command(std::string command) {
             }
 
         } else {
-            std::cout << "Sem permissão: " << command << '\n';
+            throw std::runtime_error("erro: Comando não encontrado: " + command);
         }
 
     } else {
-        std::cout << "Comando não encontrado: " << command << '\n';
+        throw std::runtime_error("erro: Sem permissão para executar: " + command);
     }
 }
 

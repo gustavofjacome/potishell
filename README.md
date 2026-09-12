@@ -37,6 +37,10 @@ Mas valeu o aprendizado.
 
 Algumas das funcionalidades e conceitos utilizados na implementação foram estudados a partir das seguintes referências:
 
-* [Ask Ubuntu — How to really clear the terminal?](https://askubuntu.com/questions/25077/how-to-really-clear-the-terminal?utm_source=chatgpt.com)
-* [TLDP — Bash Prompt HOWTO: Prompt Expansion](https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html?utm_source=chatgpt.com)
-* [TLDP — Bash Prompt HOWTO](https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html?utm_source=chatgpt.com)
+* [Tutorial - Write a Shell in C](https://brennan.io/2015/01/16/write-a-shell-in-c/)  -> os mais importantes
+* [making-linux-shell-c](https://www.geeksforgeeks.org/c/making-linux-shell-c/)       -> os mais importantes
+
+
+* [Ask Ubuntu — How to really clear the terminal?](https://askubuntu.com/questions/25077/how-to-really-clear-the-terminal)   -> Usei para aprender a limpar o terminal 
+* [TLDP — Bash Prompt HOWTO: Prompt Expansion](https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html)
+* [TLDP — Bash Prompt HOWTO](https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html)
