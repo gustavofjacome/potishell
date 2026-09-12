@@ -145,25 +145,17 @@ void process_command(std::string command) {
 
     verificacoesErros(absolute_path, command);
 
-            if (pid < 0) {
-                std::cout << "Erro de execução!" << std::endl;
-                return;
 
-            } else if (pid == 0) {
-                char* argv[2] = {
-                    (char*)command.c_str(),
-                    nullptr
-                };
-                execve(absolute_path.c_str(), argv, NULL);
+    pid_t pid = fork();
 
-            } else {
-                waitpid(pid, nullptr, 0);
-            }
+    if (pid < 0) {
+        throw std::invalid_argument("poti$h erro: Falha no (fork) " + command);
+        return;
 
-        } else {
-            throw std::runtime_error("erro: Comando não encontrado: " + command);
-        }
-
+    } else if (pid == 0) {
+        std::vector<char*> argv = converterParaArgv(args);
+            execve(absolute_path.c_str(), argv.data(), NULL);
+            exit(1);
     } else {
         throw std::runtime_error("erro: Sem permissão para executar: " + command);
     }
