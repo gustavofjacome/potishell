@@ -74,19 +74,15 @@ namespace Sessao {
         historico.clear();
     }
 
-    inline void executarPorOffset(int offset) {
-        if (offset < 0 || offset >= historico.size()) {
+    inline void executarPorOffset(int offset) { 
+        if (offset < 0 || (offset + 1) >= historico.size()) {
             throw std::runtime_error("poti$h erro: Offset de history inválido.");
         }
-        std::string cmdSalvo = historico[offset];
+        std::string cmdSalvo = historico[offset + 1];
         std::cout << cmdSalvo << '\n'; 
         process_command(cmdSalvo);    
     }
 }
-
-
-
-
 
 
 
@@ -190,7 +186,7 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
     }
 
     if (comando == "pwd") {
-        char buffer[1024];
+        char buffer[2048];
         if (getcwd(buffer, sizeof(buffer)) != nullptr) {
             std::cout << buffer << '\n';
         } else {
