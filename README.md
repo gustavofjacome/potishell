@@ -1,7 +1,7 @@
 
 # Potishell
 
-> **Nota:** o nome do projeto será alterado de **Vish** para **Potishell**. A mudança surgiu porque lembrei do professor Lucena. Com isso, os comandos internos da shell também serão escritos em português.
+> **Nota:** o nome do projeto será alterado de **Vish** para **Potishell**. Com isso, os comandos internos da shell também serão escritos em português.
 
 ## Sobre o processo de implementação
 
