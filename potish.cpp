@@ -8,7 +8,9 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <deque> 
+#include <deque>
+#include <fstream>
+#include <limits.h>
 
 extern char **environ; //variaveis de ambiente permitiu que eu conseguisse compilar com o g++ pelo o shell ela é passada como parametro no meu execve
 
@@ -94,33 +96,39 @@ namespace Historico {
     }
 
     inline void adicionar(const std::string& comando) {
-        historico.push_front(comando);
-        if (historico.size() > 10) {
-            historico.pop_back();
+        emMemoria.push_front(comando);
+
+        // ios::app so acrescenta a linha no final do arquivo, sem reescrever o historico inteiro
+        std::ofstream arquivo(obterCaminhoArquivo(), std::ios::app);
+        if (arquivo.is_open()) {
+            arquivo << comando << '\n';
         }
     }
 
     inline void imprimir() {
-        for (int i = historico.size() - 1; i >= 0; --i) {
-            std::cout << i << " " << historico[i] << '\n';
+        for (int i = emMemoria.size() - 1; i >= 0; --i) {
+            std::cout << i << " " << emMemoria[i] << '\n';
         }
     }
 
     inline void limpar() {
-        historico.clear();
+        emMemoria.clear();
+        // abrir em modo trunc e fechar na hora ja apaga todo o conteudo do arquivo
+        std::ofstream arquivo(obterCaminhoArquivo(), std::ios::trunc);
     }
 
     inline void executarPorOffset(int offset) { 
-        if (offset < 0 || (offset + 1) >= (int)historico.size()) {
+        if (offset < 0 || (offset + 1) >= (int)emMemoria.size()) {
             throw std::runtime_error("poti$h erro: Offset de history inválido.");
         }
-        std::string cmdSalvo = historico[offset + 1];
+        std::string cmdSalvo = emMemoria[offset + 1];
         std::cout << cmdSalvo << '\n'; 
         process_command(cmdSalvo);    
     }
 }
 
 int main() {
+    Historico::carregar();
     const std::string nomeBashFormatado = Cor::amarelo("poti$h🦐 ") + Cor::ciano("❯ ");
     potishLoop(true, nomeBashFormatado);
     return 0;
@@ -221,18 +229,18 @@ bool executarComandosInternos(const std::vector<std::string>& args) {
     }
     if (comando == "history" || comando == "historico") {
         if (args.size() == 1) {
-            Sessao::imprimir();
+            Historico::imprimir();
             return true;
         } 
         else if (args.size() == 2) {
             if (args[1] == "-c") {
-                Sessao::limpar();
+                Historico::limpar();
                 return true;
             } 
             else {
                 try {
                     int offset = std::stoi(args[1]); 
-                    Sessao::executarPorOffset(offset); 
+                    Historico::executarPorOffset(offset); 
                     return true;
                 } catch (const std::invalid_argument&) {
                     throw std::runtime_error("poti$h erro: history offset deve ser um número válido. (1 à 10)");
@@ -287,7 +295,7 @@ void potishLoop(bool interruptor, std::string nomeShell){
         getline(std::cin, command);
 
         if (!command.empty()) {
-            Sessao::adicionar(command);
+            Historico::adicionar(command);
             try {
                 process_command(command);
             }
