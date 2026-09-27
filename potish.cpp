@@ -55,8 +55,43 @@ namespace Terminal {
     }
 }
 
-namespace Sessao {
-    std::deque<std::string> historico;
+namespace Historico {
+    std::deque<std::string> emMemoria; // cache em RAM; o arquivo .potish_historico é o "backup" persistente
+
+    // descobre a pasta onde o executavel do potish esta rodando (nao a pasta atual do terminal)
+    // assim o arquivo de historico sempre fica junto do binario, independente de onde o usuario chamou o shell
+    inline std::string obterCaminhoArquivo() {
+        char buffer[PATH_MAX];
+        ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+        std::string pastaExecutavel = "."; // fallback caso o readlink falhe
+
+        if (len != -1) {
+            buffer[len] = '\0';
+            std::string caminhoCompleto(buffer);
+            size_t pos = caminhoCompleto.find_last_of('/');
+            if (pos != std::string::npos) {
+                pastaExecutavel = caminhoCompleto.substr(0, pos);
+            }
+        }
+        return pastaExecutavel + "/.potish_historico";
+    }
+
+    // chamada uma unica vez, no inicio do main(), pra popular a memoria com o que ja foi salvo em execucoes anteriores
+    inline void carregar() {
+        std::ifstream arquivo(obterCaminhoArquivo());
+        if (!arquivo.is_open()) {
+            return; // primeira vez rodando o shell, arquivo ainda nem existe
+        }
+
+        std::string linha;
+        while (std::getline(arquivo, linha)) {
+            if (!linha.empty()) {
+                // o arquivo guarda do mais antigo (topo) pro mais novo (fim)
+                // dar push_front na ordem de leitura deixa o comando mais recente na frente do deque
+                emMemoria.push_front(linha);
+            }
+        }
+    }
 
     inline void adicionar(const std::string& comando) {
         historico.push_front(comando);
